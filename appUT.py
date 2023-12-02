@@ -1,7 +1,7 @@
 import numpy as np
 from flask import Flask, request, jsonify, render_template
 import pickle
-
+import os 
 
 
 appUT =Flask(__name__)
@@ -60,4 +60,4 @@ def predict_api():
     return jsonify(output)        
 
 if __name__ == "__main__":
-    appUT.run(debug=True)
+    appUT.run(host='0.0.0.0', port=int(os.environ.get('PORT', 4000)), debug=True)
