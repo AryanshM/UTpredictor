@@ -12,7 +12,9 @@ def home():
     return render_template('index.html')
 @appUT.route('/predict', methods = ['POST'])
 def predict():
-    int_features = [int(x) for x in request.form.values()]
+    input_data = request.get_json()
+
+    int_features = input_data.get('features', [])
     final_features = [np.array(int_features)]
 
     if (final_features[0] < 70):
