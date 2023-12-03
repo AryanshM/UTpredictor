@@ -2,9 +2,14 @@ import numpy as np
 from flask import Flask, request, jsonify, render_template
 import pickle
 import os 
+from flask import Flask
+from flask_cors import CORS
+
 
 
 appUT =Flask(__name__)
+CORS(appUT, resources={r"/*": {"origins": "*"}})
+
 modelUT=pickle.load(open('modelUT.pkl','rb'))
 
 @appUT.route('/')
