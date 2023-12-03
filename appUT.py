@@ -13,6 +13,8 @@ CORS(appUT, resources={r"/*": {"origins": "*"}})
 modelUT=pickle.load(open('modelUT.pkl','rb'))
 modelUT2=pickle.load(open('modelUT2.pkl','rb'))
 
+modelUT3=pickle.load(open('modelUT3.pkl','rb'))
+
 @appUT.route('/')
 def home():
     return render_template('index.html')
@@ -55,16 +57,9 @@ def predict():
 def predictUT():
     input_data = request.get_json()
 
-    # Assuming 'features' is a list of 5 features
     int_features = input_data.get('features', [])
-    
-    # Convert the list of 5 features into a numpy array
     final_features = np.array(int_features).reshape(1, -1)
-
-    # Assuming modelUT2 is a model that accepts 5 features and produces 7 predictions
     predictions = modelUT2.predict(final_features)
-
-    # Round each prediction element to 2 decimal places
     rounded_predictions = np.round(predictions, 2)
 
     response_data = {
@@ -75,7 +70,37 @@ def predictUT():
     
     return jsonify(response_data)
 
+@appUT.route('/predictOE', methods = ['POST'])   
+def predictOE():
+    input_data = request.get_json()
 
+   
+    int_features = input_data.get('features', [])
+    
+    final_features = np.array(int_features).reshape(1, -1)
+
+    predictions = modelUT3.predict(final_features)
+
+    rounded_predictions = np.round(predictions, 2)
+    if rounded_predictions == 1:
+            rounded_predictions = "Energy Science"
+    if rounded_predictions == 2:
+            rounded_predictions = "Material Science"
+    if rounded_predictions == 3:
+            rounded_predictions = "Mechanics"
+    if rounded_predictions == 4:
+            rounded_predictions = "Sensor Instrumentation"
+    if rounded_predictions == 0:
+            rounded_predictions = "Digital Electronics"
+
+    response_data = {
+        'prediction_text': 'You should take the elective: {}'.format(
+            rounded_predictions
+        )
+    }
+
+    
+    return jsonify(response_data)
 
 @appUT.route('/predict_api',methods=['POST'])
 def predict_api():
