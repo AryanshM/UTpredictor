@@ -11,6 +11,7 @@ appUT =Flask(__name__)
 CORS(appUT, resources={r"/*": {"origins": "*"}})
 
 modelUT=pickle.load(open('modelUT.pkl','rb'))
+modelUT2=pickle.load(open('modelUT2.pkl','rb'))
 
 @appUT.route('/')
 def home():
@@ -50,6 +51,32 @@ def predict():
             
     return jsonify(response_data)
 
+@appUT.route('/predictUT', methods = ['POST'])   
+def predictUT():
+    input_data = request.get_json()
+
+    # Assuming 'features' is a list of 5 features
+    int_features = input_data.get('features', [])
+    
+    # Convert the list of 5 features into a numpy array
+    final_features = np.array(int_features).reshape(1, -1)
+
+    # Assuming modelUT2 is a model that accepts 5 features and produces 7 predictions
+    predictions = modelUT2.predict(final_features)
+
+    # Round each prediction element to 2 decimal places
+    rounded_predictions = np.round(predictions, 2)
+
+    response_data = {
+        'prediction_text': 'You are expected to score {} in CHEMISTRY, {} in MATHS, {} in ELECTRONICS, {} in MECHANICAL, {} in SOFTSKILLS, TOTAL: {} and PERCENTAGE: {}'.format(
+            *rounded_predictions.flatten()
+        )
+    }
+    
+    return jsonify(response_data)
+
+
+
 @appUT.route('/predict_api',methods=['POST'])
 def predict_api():
     '''
@@ -62,7 +89,8 @@ def predict_api():
     output = prediction
 
     
-    return jsonify(output)        
+    return jsonify(output)   
+
 
 if __name__ == "__main__":
     appUT.run(host='0.0.0.0', port=int(os.environ.get('PORT', 4000)), debug=True)
